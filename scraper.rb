@@ -7,3 +7,5 @@ def scrapper
     raw_html = httparty.get(url)
     Nokogiri.HTML5(raw_html)
 end
+
+scrapper
