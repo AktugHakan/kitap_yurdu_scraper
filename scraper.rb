@@ -1,29 +1,27 @@
 require 'httparty'.freeze
 require 'nokogiri'.freeze
-require 'product.rb'.freeze
+require './product'.freeze
 
 # Set of tools to GET and parse a website
 module Scrapper
-    def get_dom(url)
+    def self.get_dom(url)
         raw_html = HTTParty.get(url)
-        binding.irb # DEBUG ONLY
         return Nokogiri.HTML5(raw_html)
     end
 
-    def product_cr_renderer(product_cr)
-        raise TypeError, 'Expected a parsed HTML fragment/file.' unless dom.respond_to? 'css'
+    def self.product_cr_renderer(product_cr)
+        raise TypeError, 'Expected a parsed HTML fragment/file.' unless product_cr.respond_to? 'css'
 
         rank = product_cr.css('div.bestseller-rank > div').text.to_i
-        title = product_cr.css('div.name-ellipsis').text
-        author = product_cr.css('div.author > span').text
-        publisher = product_cr.css('div.publisher').text
-        price = product_cr.css('div.price-new > span.value').text.to_f
-        binding.irb
-
+        title = product_cr.css('div.name.ellipsis').text.strip
+        author = product_cr.css('div.author > span').text.strip
+        publisher = product_cr.css('div.publisher').text.strip
+        # Converting comma to dot because to_f does not work with comma.
+        price = product_cr.css('div.price-new > span.value').text.sub(',', '.').to_f
         return Book.new title, author, publisher, price, rank
     end
 
-    def best_seller_list(dom)
+    def self.best_seller_list(dom)
         raise TypeError, 'Expected a parsed HTML fragment/file.' unless dom.respond_to? 'css'
 
         books = []
