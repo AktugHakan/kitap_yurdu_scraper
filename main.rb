@@ -8,4 +8,5 @@ File.open('./book_list.txt', 'w') do |file|
     list.each do |book|
         file.write("#{book.rank}. #{book.title} by #{book.author} | #{book.publisher} | #{book.price}₺\n")
     end
+    next_page = Scrapper.next_page_url(dom)
 end

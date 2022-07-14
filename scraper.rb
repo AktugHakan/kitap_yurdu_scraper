@@ -8,12 +8,13 @@ module Scrapper
         raw_html = HTTParty.get(url)
         dom = Nokogiri.HTML5(raw_html)
         if dom.errors.any?
-            print '---ERROR!---'.freeze
+            print '---ERROR!---'
             dom.errors.each do |error|
                 print "    #{error}"
             end
             raise "Couldn't parse the document!"
         end
+        return dom
     end
 
     def self.product_cr_renderer(product_cr)
@@ -41,9 +42,12 @@ module Scrapper
         return books
     end
 
-    def next_page_url(dom)
+    def self.next_page_url(dom)
         raise TypeError, 'Expected a parsed HTML fragment/file.' unless dom.respond_to? 'css'
 
-        dom.css('div.pagination > a.next')
+        next_page = dom.css('div.pagination a.next').first[:href]
+        return next_page unless next_page.nil?
+
+        raise 'There is no next page!'
     end
 end
