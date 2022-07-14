@@ -6,7 +6,14 @@ require './product'.freeze
 module Scrapper
     def self.get_dom(url)
         raw_html = HTTParty.get(url)
-        return Nokogiri.HTML5(raw_html)
+        dom = Nokogiri.HTML5(raw_html)
+        if dom.errors.any?
+            print '---ERROR!---'.freeze
+            dom.errors.each do |error|
+                print "    #{error}"
+            end
+            raise "Couldn't parse the document!"
+        end
     end
 
     def self.product_cr_renderer(product_cr)
@@ -32,5 +39,11 @@ module Scrapper
         end
 
         return books
+    end
+
+    def next_page_url(dom)
+        raise TypeError, 'Expected a parsed HTML fragment/file.' unless dom.respond_to? 'css'
+
+        dom.css('div.pagination > a.next')
     end
 end
