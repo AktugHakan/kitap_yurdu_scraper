@@ -45,9 +45,9 @@ module Scrapper
     def self.next_page_url(dom)
         raise TypeError, 'Expected a parsed HTML fragment/file.' unless dom.respond_to? 'css'
 
-        next_page = dom.css('div.pagination a.next').first[:href]
-        return next_page unless next_page.nil?
+        next_page = dom.css('div.pagination a.next')
+        return next_page.first[:href] unless next_page.nil?
 
-        raise 'There is no next page!'
+        raise StopIteration, 'There is no next page!'
     end
 end
